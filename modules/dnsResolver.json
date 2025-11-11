@@ -1,0 +1,111 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.38.33.27573",
+      "templateHash": "7506592570388858139"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "prefix": {
+      "type": "string"
+    },
+    "vnetId": {
+      "type": "string"
+    },
+    "subnetName": {
+      "type": "string"
+    },
+    "forwarders": {
+      "type": "array",
+      "defaultValue": []
+    }
+  },
+  "variables": {
+    "dnsResolverName": "[format('{0}-dnsr', parameters('prefix'))]",
+    "outboundEndpointName": "[format('{0}-dnsr-out', parameters('prefix'))]",
+    "rulesetName": "[format('{0}-dnsr-ruleset', parameters('prefix'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/dnsResolvers",
+      "apiVersion": "2025-05-01",
+      "name": "[variables('dnsResolverName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "virtualNetwork": {
+          "id": "[parameters('vnetId')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/dnsResolvers/outboundEndpoints",
+      "apiVersion": "2025-05-01",
+      "name": "[format('{0}/{1}', variables('dnsResolverName'), variables('outboundEndpointName'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "subnet": {
+          "id": "[format('{0}/subnets/{1}', parameters('vnetId'), parameters('subnetName'))]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnsResolvers', variables('dnsResolverName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/dnsForwardingRulesets",
+      "apiVersion": "2025-05-01",
+      "name": "[variables('rulesetName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "dnsResolverOutboundEndpoints": [
+          {
+            "id": "[resourceId('Microsoft.Network/dnsResolvers/outboundEndpoints', variables('dnsResolverName'), variables('outboundEndpointName'))]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnsResolvers/outboundEndpoints', variables('dnsResolverName'), variables('outboundEndpointName'))]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "forwardingRules",
+        "count": "[length(parameters('forwarders'))]"
+      },
+      "type": "Microsoft.Network/dnsForwardingRulesets/forwardingRules",
+      "apiVersion": "2025-05-01",
+      "name": "[format('{0}/{1}', variables('rulesetName'), parameters('forwarders')[copyIndex()].name)]",
+      "properties": {
+        "domainName": "[parameters('forwarders')[copyIndex()].domainName]",
+        "targetDnsServers": [
+          {
+            "ipAddress": "[parameters('forwarders')[copyIndex()].ipAddress]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/dnsForwardingRulesets', variables('rulesetName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "dnsResolverId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/dnsResolvers', variables('dnsResolverName'))]"
+    },
+    "outboundEndpointId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/dnsResolvers/outboundEndpoints', variables('dnsResolverName'), variables('outboundEndpointName'))]"
+    },
+    "rulesetId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/dnsForwardingRulesets', variables('rulesetName'))]"
+    }
+  }
+}

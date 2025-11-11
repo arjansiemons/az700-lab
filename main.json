@@ -1,0 +1,1435 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.38.33.27573",
+      "templateHash": "8756021626189328860"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "westeurope"
+    },
+    "prefix": {
+      "type": "string",
+      "defaultValue": "az700lab"
+    },
+    "enableVpnGateway": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "enableAzureFirewall": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "enablePrivateEndpoint": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "enableDnsResolver": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "enableAppGateway": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "enableLoadBalancer": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "enableServiceEndpoint": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "enableFrontDoor": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "enableTrafficManager": {
+      "type": "bool",
+      "defaultValue": false
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "networkDeployment",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.38.33.27573",
+              "templateHash": "11592032637599316750"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "westeurope"
+            },
+            "prefix": {
+              "type": "string",
+              "defaultValue": "az700lab"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "network",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "prefix": {
+                    "value": "[parameters('prefix')]"
+                  },
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "enableServiceEndpoint": {
+                    "value": false
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "15409317372556297038"
+                    }
+                  },
+                  "parameters": {
+                    "prefix": {
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "string"
+                    },
+                    "enableServiceEndpoint": {
+                      "type": "bool",
+                      "defaultValue": false
+                    }
+                  },
+                  "variables": {
+                    "hubVnetName": "[format('{0}-hub-vnet', parameters('prefix'))]",
+                    "spokeAppVnetName": "[format('{0}-spoke-app-vnet', parameters('prefix'))]",
+                    "spokeDataVnetName": "[format('{0}-spoke-data-vnet', parameters('prefix'))]"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/virtualNetworks",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('hubVnetName')]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "addressSpace": {
+                          "addressPrefixes": [
+                            "10.0.0.0/16"
+                          ]
+                        },
+                        "subnets": [
+                          {
+                            "name": "GatewaySubnet",
+                            "properties": {
+                              "addressPrefix": "10.0.1.0/27"
+                            }
+                          },
+                          {
+                            "name": "AzureFirewallSubnet",
+                            "properties": {
+                              "addressPrefix": "10.0.2.0/26"
+                            }
+                          },
+                          {
+                            "name": "dnsresolver",
+                            "properties": {
+                              "addressPrefix": "10.0.3.0/28"
+                            }
+                          },
+                          {
+                            "name": "appgw-subnet",
+                            "properties": {
+                              "addressPrefix": "10.0.4.0/26"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/virtualNetworks",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('spokeAppVnetName')]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "addressSpace": {
+                          "addressPrefixes": [
+                            "10.1.0.0/16"
+                          ]
+                        },
+                        "subnets": [
+                          {
+                            "name": "app",
+                            "properties": {
+                              "addressPrefix": "10.1.1.0/24"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/virtualNetworks",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('spokeDataVnetName')]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "addressSpace": {
+                          "addressPrefixes": [
+                            "10.2.0.0/16"
+                          ]
+                        },
+                        "subnets": [
+                          {
+                            "name": "data",
+                            "properties": {
+                              "addressPrefix": "10.2.2.0/24",
+                              "serviceEndpoints": "[if(parameters('enableServiceEndpoint'), createArray(createObject('service', 'Microsoft.Storage')), createArray())]"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+                      "apiVersion": "2025-05-01",
+                      "name": "[format('{0}/{1}', variables('hubVnetName'), 'Hub-to-SpokeApp')]",
+                      "properties": {
+                        "remoteVirtualNetwork": {
+                          "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('spokeAppVnetName'))]"
+                        },
+                        "allowVirtualNetworkAccess": true,
+                        "allowForwardedTraffic": true,
+                        "allowGatewayTransit": true
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]",
+                        "[resourceId('Microsoft.Network/virtualNetworks', variables('spokeAppVnetName'))]"
+                      ]
+                    },
+                    {
+                      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+                      "apiVersion": "2025-05-01",
+                      "name": "[format('{0}/{1}', variables('spokeAppVnetName'), 'SpokeApp-to-Hub')]",
+                      "properties": {
+                        "remoteVirtualNetwork": {
+                          "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]"
+                        },
+                        "allowVirtualNetworkAccess": true,
+                        "useRemoteGateways": false
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]",
+                        "[resourceId('Microsoft.Network/virtualNetworks', variables('spokeAppVnetName'))]"
+                      ]
+                    },
+                    {
+                      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+                      "apiVersion": "2025-05-01",
+                      "name": "[format('{0}/{1}', variables('hubVnetName'), 'Hub-to-SpokeData')]",
+                      "properties": {
+                        "remoteVirtualNetwork": {
+                          "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('spokeDataVnetName'))]"
+                        },
+                        "allowVirtualNetworkAccess": true,
+                        "allowForwardedTraffic": true,
+                        "allowGatewayTransit": true
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]",
+                        "[resourceId('Microsoft.Network/virtualNetworks', variables('spokeDataVnetName'))]"
+                      ]
+                    },
+                    {
+                      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+                      "apiVersion": "2025-05-01",
+                      "name": "[format('{0}/{1}', variables('spokeDataVnetName'), 'SpokeData-to-Hub')]",
+                      "properties": {
+                        "remoteVirtualNetwork": {
+                          "id": "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]"
+                        },
+                        "allowVirtualNetworkAccess": true,
+                        "useRemoteGateways": false
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]",
+                        "[resourceId('Microsoft.Network/virtualNetworks', variables('spokeDataVnetName'))]"
+                      ]
+                    }
+                  ],
+                  "outputs": {
+                    "hubVnetId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/virtualNetworks', variables('hubVnetName'))]"
+                    },
+                    "spokeAppVnetId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/virtualNetworks', variables('spokeAppVnetName'))]"
+                    },
+                    "spokeDataVnetId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/virtualNetworks', variables('spokeDataVnetName'))]"
+                    },
+                    "spokeDataSubnetName": {
+                      "type": "string",
+                      "value": "data"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "hubVnetId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'network'), '2025-04-01').outputs.hubVnetId.value]"
+            },
+            "spokeAppVnetId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'network'), '2025-04-01').outputs.spokeAppVnetId.value]"
+            },
+            "spokeDataVnetId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'network'), '2025-04-01').outputs.spokeDataVnetId.value]"
+            },
+            "spokeDataSubnetName": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'network'), '2025-04-01').outputs.spokeDataSubnetName.value]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "infraDeployment",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          },
+          "hubVnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'networkDeployment'), '2025-04-01').outputs.hubVnetId.value]"
+          },
+          "spokeDataVnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'networkDeployment'), '2025-04-01').outputs.spokeDataVnetId.value]"
+          },
+          "spokeDataSubnetName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'networkDeployment'), '2025-04-01').outputs.spokeDataSubnetName.value]"
+          },
+          "enableVpnGateway": {
+            "value": "[parameters('enableVpnGateway')]"
+          },
+          "enableAzureFirewall": {
+            "value": "[parameters('enableAzureFirewall')]"
+          },
+          "enablePrivateEndpoint": {
+            "value": "[parameters('enablePrivateEndpoint')]"
+          },
+          "enableDnsResolver": {
+            "value": "[parameters('enableDnsResolver')]"
+          },
+          "enableAppGateway": {
+            "value": "[parameters('enableAppGateway')]"
+          },
+          "enableLoadBalancer": {
+            "value": "[parameters('enableLoadBalancer')]"
+          },
+          "enableServiceEndpoint": {
+            "value": "[parameters('enableServiceEndpoint')]"
+          },
+          "enableFrontDoor": {
+            "value": "[parameters('enableFrontDoor')]"
+          },
+          "enableTrafficManager": {
+            "value": "[parameters('enableTrafficManager')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.38.33.27573",
+              "templateHash": "1108284125511430288"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "westeurope"
+            },
+            "prefix": {
+              "type": "string",
+              "defaultValue": "az700lab"
+            },
+            "hubVnetId": {
+              "type": "string"
+            },
+            "spokeDataVnetId": {
+              "type": "string"
+            },
+            "spokeDataSubnetName": {
+              "type": "string"
+            },
+            "forwarders": {
+              "type": "array",
+              "defaultValue": []
+            },
+            "enableVpnGateway": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "enableAzureFirewall": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "enablePrivateEndpoint": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "enableDnsResolver": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "enableAppGateway": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "enableLoadBalancer": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "enableServiceEndpoint": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "enableFrontDoor": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "enableTrafficManager": {
+              "type": "bool",
+              "defaultValue": false
+            }
+          },
+          "resources": [
+            {
+              "condition": "[parameters('enableVpnGateway')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "vpnGateway",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "hubVnetId": {
+                    "value": "[parameters('hubVnetId')]"
+                  },
+                  "gatewaySubnetName": {
+                    "value": "GatewaySubnet"
+                  },
+                  "prefix": {
+                    "value": "[parameters('prefix')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "4377435759239677290"
+                    }
+                  },
+                  "parameters": {
+                    "location": {
+                      "type": "string"
+                    },
+                    "hubVnetId": {
+                      "type": "string"
+                    },
+                    "gatewaySubnetName": {
+                      "type": "string"
+                    },
+                    "prefix": {
+                      "type": "string"
+                    }
+                  },
+                  "variables": {
+                    "publicIpName": "[format('{0}-vpn-pip', parameters('prefix'))]",
+                    "vnetGatewayName": "[format('{0}-vpngw', parameters('prefix'))]"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/publicIPAddresses",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('publicIpName')]",
+                      "location": "[parameters('location')]",
+                      "sku": {
+                        "name": "Basic"
+                      },
+                      "properties": {
+                        "publicIPAllocationMethod": "Dynamic"
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/virtualNetworkGateways",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('vnetGatewayName')]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "gatewayType": "Vpn",
+                        "vpnType": "RouteBased",
+                        "enableBgp": false,
+                        "sku": {
+                          "name": "VpnGw1",
+                          "tier": "VpnGw1"
+                        },
+                        "ipConfigurations": [
+                          {
+                            "name": "vnetGatewayConfig",
+                            "properties": {
+                              "privateIPAllocationMethod": "Dynamic",
+                              "subnet": {
+                                "id": "[format('{0}/subnets/{1}', parameters('hubVnetId'), parameters('gatewaySubnetName'))]"
+                              },
+                              "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+                      ]
+                    }
+                  ],
+                  "outputs": {
+                    "publicIpAddress": {
+                      "type": "string",
+                      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName')), '2025-05-01').ipAddress]"
+                    },
+                    "gatewayId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/virtualNetworkGateways', variables('vnetGatewayName'))]"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "condition": "[parameters('enableAzureFirewall')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "azureFirewall",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "hubVnetId": {
+                    "value": "[parameters('hubVnetId')]"
+                  },
+                  "firewallSubnetName": {
+                    "value": "AzureFirewallSubnet"
+                  },
+                  "prefix": {
+                    "value": "[parameters('prefix')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "9365751472075763755"
+                    }
+                  },
+                  "parameters": {
+                    "location": {
+                      "type": "string"
+                    },
+                    "hubVnetId": {
+                      "type": "string"
+                    },
+                    "firewallSubnetName": {
+                      "type": "string"
+                    },
+                    "prefix": {
+                      "type": "string"
+                    }
+                  },
+                  "variables": {
+                    "pipName": "[format('{0}-azfw-pip', parameters('prefix'))]",
+                    "fwName": "[format('{0}-azfw', parameters('prefix'))]"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/publicIPAddresses",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('pipName')]",
+                      "location": "[parameters('location')]",
+                      "sku": {
+                        "name": "Standard"
+                      },
+                      "properties": {
+                        "publicIPAllocationMethod": "Static"
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/azureFirewalls",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('fwName')]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "sku": {
+                          "name": "AZFW_VNet",
+                          "tier": "Standard"
+                        },
+                        "ipConfigurations": [
+                          {
+                            "name": "fwConfig",
+                            "properties": {
+                              "subnet": {
+                                "id": "[format('{0}/subnets/{1}', parameters('hubVnetId'), parameters('firewallSubnetName'))]"
+                              },
+                              "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]"
+                      ]
+                    }
+                  ],
+                  "outputs": {
+                    "firewallId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/azureFirewalls', variables('fwName'))]"
+                    },
+                    "firewallPublicIp": {
+                      "type": "string",
+                      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('pipName')), '2025-05-01').ipAddress]"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "condition": "[parameters('enablePrivateEndpoint')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "privateEndpoint",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "prefix": {
+                    "value": "[parameters('prefix')]"
+                  },
+                  "vnetId": {
+                    "value": "[parameters('spokeDataVnetId')]"
+                  },
+                  "subnetName": {
+                    "value": "[parameters('spokeDataSubnetName')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "16618050566059789849"
+                    }
+                  },
+                  "parameters": {
+                    "location": {
+                      "type": "string"
+                    },
+                    "prefix": {
+                      "type": "string"
+                    },
+                    "vnetId": {
+                      "type": "string"
+                    },
+                    "subnetName": {
+                      "type": "string"
+                    }
+                  },
+                  "variables": {
+                    "storageName": "[toLower(format('{0}st{1}', parameters('prefix'), uniqueString(resourceGroup().id)))]",
+                    "storageNameTrimmed": "[substring(variables('storageName'), 0, min(length(variables('storageName')), 24))]",
+                    "privateEndpointName": "[format('{0}-pe-storage', parameters('prefix'))]",
+                    "privateDnsZoneName": "[format('privatelink.blob.{0}', environment().suffixes.storage)]"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Storage/storageAccounts",
+                      "apiVersion": "2025-06-01",
+                      "name": "[variables('storageNameTrimmed')]",
+                      "location": "[parameters('location')]",
+                      "sku": {
+                        "name": "Standard_V2"
+                      },
+                      "kind": "StorageV2",
+                      "properties": {
+                        "minimumTlsVersion": "TLS1_2",
+                        "allowBlobPublicAccess": false,
+                        "networkAcls": {
+                          "defaultAction": "Deny",
+                          "bypass": "AzureServices"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/privateEndpoints",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('privateEndpointName')]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "subnet": {
+                          "id": "[format('{0}/subnets/{1}', parameters('vnetId'), parameters('subnetName'))]"
+                        },
+                        "privateLinkServiceConnections": [
+                          {
+                            "name": "[format('{0}-pls', variables('privateEndpointName'))]",
+                            "properties": {
+                              "privateLinkServiceId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageNameTrimmed'))]",
+                              "groupIds": [
+                                "blob"
+                              ],
+                              "requestMessage": "Private endpoint for storage"
+                            }
+                          }
+                        ]
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageNameTrimmed'))]"
+                      ]
+                    },
+                    {
+                      "type": "Microsoft.Network/privateDnsZones",
+                      "apiVersion": "2024-06-01",
+                      "name": "[variables('privateDnsZoneName')]",
+                      "location": "global",
+                      "properties": {}
+                    },
+                    {
+                      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+                      "apiVersion": "2024-06-01",
+                      "name": "[format('{0}/{1}', variables('privateDnsZoneName'), format('{0}-link', parameters('prefix')))]",
+                      "properties": {
+                        "virtualNetwork": {
+                          "id": "[parameters('vnetId')]"
+                        },
+                        "registrationEnabled": false
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+                      ]
+                    }
+                  ],
+                  "outputs": {
+                    "storageAccountName": {
+                      "type": "string",
+                      "value": "[variables('storageNameTrimmed')]"
+                    },
+                    "privateEndpointId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/privateEndpoints', variables('privateEndpointName'))]"
+                    },
+                    "privateDnsZone": {
+                      "type": "string",
+                      "value": "[variables('privateDnsZoneName')]"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "condition": "[parameters('enableDnsResolver')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "dnsResolver",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "prefix": {
+                    "value": "[parameters('prefix')]"
+                  },
+                  "vnetId": {
+                    "value": "[parameters('hubVnetId')]"
+                  },
+                  "subnetName": {
+                    "value": "dnsresolver"
+                  },
+                  "forwarders": {
+                    "value": "[parameters('forwarders')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "7506592570388858139"
+                    }
+                  },
+                  "parameters": {
+                    "location": {
+                      "type": "string"
+                    },
+                    "prefix": {
+                      "type": "string"
+                    },
+                    "vnetId": {
+                      "type": "string"
+                    },
+                    "subnetName": {
+                      "type": "string"
+                    },
+                    "forwarders": {
+                      "type": "array",
+                      "defaultValue": []
+                    }
+                  },
+                  "variables": {
+                    "dnsResolverName": "[format('{0}-dnsr', parameters('prefix'))]",
+                    "outboundEndpointName": "[format('{0}-dnsr-out', parameters('prefix'))]",
+                    "rulesetName": "[format('{0}-dnsr-ruleset', parameters('prefix'))]"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/dnsResolvers",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('dnsResolverName')]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "virtualNetwork": {
+                          "id": "[parameters('vnetId')]"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/dnsResolvers/outboundEndpoints",
+                      "apiVersion": "2025-05-01",
+                      "name": "[format('{0}/{1}', variables('dnsResolverName'), variables('outboundEndpointName'))]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "subnet": {
+                          "id": "[format('{0}/subnets/{1}', parameters('vnetId'), parameters('subnetName'))]"
+                        }
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/dnsResolvers', variables('dnsResolverName'))]"
+                      ]
+                    },
+                    {
+                      "type": "Microsoft.Network/dnsForwardingRulesets",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('rulesetName')]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "dnsResolverOutboundEndpoints": [
+                          {
+                            "id": "[resourceId('Microsoft.Network/dnsResolvers/outboundEndpoints', variables('dnsResolverName'), variables('outboundEndpointName'))]"
+                          }
+                        ]
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/dnsResolvers/outboundEndpoints', variables('dnsResolverName'), variables('outboundEndpointName'))]"
+                      ]
+                    },
+                    {
+                      "copy": {
+                        "name": "forwardingRules",
+                        "count": "[length(parameters('forwarders'))]"
+                      },
+                      "type": "Microsoft.Network/dnsForwardingRulesets/forwardingRules",
+                      "apiVersion": "2025-05-01",
+                      "name": "[format('{0}/{1}', variables('rulesetName'), parameters('forwarders')[copyIndex()].name)]",
+                      "properties": {
+                        "domainName": "[parameters('forwarders')[copyIndex()].domainName]",
+                        "targetDnsServers": [
+                          {
+                            "ipAddress": "[parameters('forwarders')[copyIndex()].ipAddress]"
+                          }
+                        ]
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/dnsForwardingRulesets', variables('rulesetName'))]"
+                      ]
+                    }
+                  ],
+                  "outputs": {
+                    "dnsResolverId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/dnsResolvers', variables('dnsResolverName'))]"
+                    },
+                    "outboundEndpointId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/dnsResolvers/outboundEndpoints', variables('dnsResolverName'), variables('outboundEndpointName'))]"
+                    },
+                    "rulesetId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/dnsForwardingRulesets', variables('rulesetName'))]"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "condition": "[parameters('enableAppGateway')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "appGateway",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "prefix": {
+                    "value": "[parameters('prefix')]"
+                  },
+                  "vnetId": {
+                    "value": "[parameters('hubVnetId')]"
+                  },
+                  "subnetName": {
+                    "value": "appgw-subnet"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "11738237750817256476"
+                    }
+                  },
+                  "parameters": {
+                    "location": {
+                      "type": "string"
+                    },
+                    "prefix": {
+                      "type": "string"
+                    },
+                    "vnetId": {
+                      "type": "string"
+                    },
+                    "subnetName": {
+                      "type": "string"
+                    }
+                  },
+                  "variables": {
+                    "publicIpName": "[format('{0}-appgw-pip', parameters('prefix'))]",
+                    "appGwName": "[format('{0}-appgw', parameters('prefix'))]",
+                    "appGwResId": "[resourceId('Microsoft.Network/applicationGateways', variables('appGwName'))]"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/publicIPAddresses",
+                      "apiVersion": "2024-10-01",
+                      "name": "[variables('publicIpName')]",
+                      "location": "[parameters('location')]",
+                      "sku": {
+                        "name": "Standard"
+                      },
+                      "properties": {
+                        "publicIPAllocationMethod": "Dynamic"
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/applicationGateways",
+                      "apiVersion": "2024-10-01",
+                      "name": "[variables('appGwName')]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "sku": {
+                          "name": "Standard_v2",
+                          "tier": "Standard_v2",
+                          "capacity": 1
+                        },
+                        "gatewayIPConfigurations": [
+                          {
+                            "name": "appGwIpConfig",
+                            "properties": {
+                              "subnet": {
+                                "id": "[format('{0}/subnets/{1}', parameters('vnetId'), parameters('subnetName'))]"
+                              }
+                            }
+                          }
+                        ],
+                        "frontendIPConfigurations": [
+                          {
+                            "name": "appGwFrontend",
+                            "properties": {
+                              "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+                              }
+                            }
+                          }
+                        ],
+                        "frontendPorts": [
+                          {
+                            "name": "port80",
+                            "properties": {
+                              "port": 80
+                            }
+                          }
+                        ],
+                        "backendAddressPools": [
+                          {
+                            "name": "backendPool"
+                          }
+                        ],
+                        "httpListeners": [
+                          {
+                            "name": "listener",
+                            "properties": {
+                              "frontendIPConfiguration": {
+                                "id": "[format('{0}/frontendIPConfigurations/appGwFrontend', variables('appGwResId'))]"
+                              },
+                              "frontendPort": {
+                                "id": "[format('{0}/frontendPorts/port80', variables('appGwResId'))]"
+                              },
+                              "protocol": "Http"
+                            }
+                          }
+                        ],
+                        "requestRoutingRules": [
+                          {
+                            "name": "rule1",
+                            "properties": {
+                              "ruleType": "Basic",
+                              "httpListener": {
+                                "id": "[format('{0}/httpListeners/listener', variables('appGwResId'))]"
+                              },
+                              "backendAddressPool": {
+                                "id": "[format('{0}/backendAddressPools/backendPool', variables('appGwResId'))]"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+                      ]
+                    }
+                  ],
+                  "outputs": {
+                    "frontendPublicIp": {
+                      "type": "string",
+                      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName')), '2024-10-01').ipAddress]"
+                    },
+                    "appGatewayId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/applicationGateways', variables('appGwName'))]"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "condition": "[parameters('enableLoadBalancer')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "loadBalancer",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "prefix": {
+                    "value": "[parameters('prefix')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "10978115110219387228"
+                    }
+                  },
+                  "parameters": {
+                    "location": {
+                      "type": "string"
+                    },
+                    "prefix": {
+                      "type": "string"
+                    }
+                  },
+                  "variables": {
+                    "pipName": "[format('{0}-lb-pip', parameters('prefix'))]",
+                    "lbName": "[format('{0}-lb', parameters('prefix'))]",
+                    "lbResId": "[resourceId('Microsoft.Network/loadBalancers', variables('lbName'))]"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/publicIPAddresses",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('pipName')]",
+                      "location": "[parameters('location')]",
+                      "sku": {
+                        "name": "Standard"
+                      },
+                      "properties": {
+                        "publicIPAllocationMethod": "Static"
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/loadBalancers",
+                      "apiVersion": "2025-05-01",
+                      "name": "[variables('lbName')]",
+                      "location": "[parameters('location')]",
+                      "sku": {
+                        "name": "Standard"
+                      },
+                      "properties": {
+                        "frontendIPConfigurations": [
+                          {
+                            "name": "LoadBalancerFrontEnd",
+                            "properties": {
+                              "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]"
+                              }
+                            }
+                          }
+                        ],
+                        "backendAddressPools": [
+                          {
+                            "name": "BackendPool"
+                          }
+                        ],
+                        "loadBalancingRules": [
+                          {
+                            "name": "ruleHTTP",
+                            "properties": {
+                              "frontendIPConfiguration": {
+                                "id": "[format('{0}/frontendIPConfigurations/LoadBalancerFrontEnd', variables('lbResId'))]"
+                              },
+                              "frontendPort": 80,
+                              "backendPort": 80,
+                              "protocol": "Tcp",
+                              "idleTimeoutInMinutes": 4,
+                              "backendAddressPool": {
+                                "id": "[format('{0}/backendAddressPools/BackendPool', variables('lbResId'))]"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]"
+                      ]
+                    }
+                  ],
+                  "outputs": {
+                    "publicIp": {
+                      "type": "string",
+                      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('pipName')), '2025-05-01').ipAddress]"
+                    },
+                    "loadBalancerId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/loadBalancers', variables('lbName'))]"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "condition": "[parameters('enableServiceEndpoint')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "serviceEndpoint",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "vnetId": {
+                    "value": "[parameters('spokeDataVnetId')]"
+                  },
+                  "subnetName": {
+                    "value": "[parameters('spokeDataSubnetName')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "11722065227041947990"
+                    }
+                  },
+                  "parameters": {
+                    "vnetId": {
+                      "type": "string"
+                    },
+                    "subnetName": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": [],
+                  "outputs": {
+                    "subnetId": {
+                      "type": "string",
+                      "value": "[format('{0}/subnets/{1}', parameters('vnetId'), parameters('subnetName'))]"
+                    },
+                    "note": {
+                      "type": "string",
+                      "value": "If service endpoints are required, enable Microsoft.Storage on the subnet at creation time or via CLI."
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "condition": "[parameters('enableFrontDoor')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "frontDoor",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "prefix": {
+                    "value": "[parameters('prefix')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "122794043588028407"
+                    }
+                  },
+                  "parameters": {
+                    "location": {
+                      "type": "string"
+                    },
+                    "prefix": {
+                      "type": "string"
+                    }
+                  },
+                  "variables": {
+                    "fdName": "[format('{0}-fdoor', parameters('prefix'))]"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/frontdoors",
+                      "apiVersion": "2025-10-01",
+                      "name": "[variables('fdName')]",
+                      "location": "[parameters('location')]",
+                      "properties": {
+                        "friendlyName": "[variables('fdName')]",
+                        "frontendEndpoints": [],
+                        "backendPools": [],
+                        "routingRules": []
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "frontDoorId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/frontdoors', variables('fdName'))]"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "condition": "[parameters('enableTrafficManager')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "trafficManager",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "tmLocation": {
+                    "value": "[parameters('location')]"
+                  },
+                  "prefix": {
+                    "value": "[parameters('prefix')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.38.33.27573",
+                      "templateHash": "8663675215654245793"
+                    }
+                  },
+                  "parameters": {
+                    "tmLocation": {
+                      "type": "string",
+                      "defaultValue": "global"
+                    },
+                    "prefix": {
+                      "type": "string"
+                    }
+                  },
+                  "variables": {
+                    "tmName": "[format('{0}-tm', parameters('prefix'))]"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/trafficmanagerprofiles",
+                      "apiVersion": "2022-04-01",
+                      "name": "[variables('tmName')]",
+                      "location": "[parameters('tmLocation')]",
+                      "properties": {
+                        "profileStatus": "Enabled",
+                        "trafficRoutingMethod": "Performance",
+                        "dnsConfig": {
+                          "relativeName": "[variables('tmName')]",
+                          "ttl": 30
+                        },
+                        "monitorConfig": {
+                          "protocol": "HTTP",
+                          "port": 80,
+                          "path": "/"
+                        },
+                        "endpoints": []
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "trafficManagerId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/trafficmanagerprofiles', variables('tmName'))]"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'networkDeployment')]"
+      ]
+    }
+  ],
+  "outputs": {
+    "hubVnetId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'networkDeployment'), '2025-04-01').outputs.hubVnetId.value]"
+    },
+    "spokeAppVnetId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'networkDeployment'), '2025-04-01').outputs.spokeAppVnetId.value]"
+    },
+    "spokeDataVnetId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'networkDeployment'), '2025-04-01').outputs.spokeDataVnetId.value]"
+    },
+    "spokeDataSubnetName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'networkDeployment'), '2025-04-01').outputs.spokeDataSubnetName.value]"
+    }
+  }
+}
