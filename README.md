@@ -143,9 +143,3 @@ Notes
 -----
 - Modules provide a working lab scaffold. For production use add NSGs, route tables, certificates and hardened defaults.
 - API versions target recent non-preview releases (2024/2025 series where appropriate). You may see informational linter warnings (BCP081) for very new API versions; these are non-fatal.
-
-If you want, I can:
-- add `deploy.ps1` to automate the two-step deploy using the example parameter file,
-- commit the `deploy.forwarders.json` example to the repo, or
-- harmonize API versions across all modules to a specific 2025.x or 2024.x baseline.
-
